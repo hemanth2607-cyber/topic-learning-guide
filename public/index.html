@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Learning Path Engine</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1 class="main-title">The Learning Path Engine</h1>
+            <p class="subtitle">An Academic Curriculum Generator powered by Grok AI</p>
+        </header>
+
+        <main>
+            <div class="input-card">
+                <div class="input-group">
+                    <label for="topic">Topic or Field of Study</label>
+                    <input type="text" id="topic" placeholder="e.g., Object Oriented Programming" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="level">Select Depth Level</label>
+                    <select id="level">
+                        <option value="Overview">Overview</option>
+                        <option value="Detailed">Detailed</option>
+                        <option value="Deep Learn">Deep Learn</option>
+                    </select>
+                </div>
+
+                <button id="generate-btn">Generate Curriculum</button>
+            </div>
+
+            <div id="loader" class="loader hidden">
+                <div class="spinner"></div>
+                <p>Generating Custom Curriculum, please wait...</p>
+            </div>
+
+            <div id="output-container" class="hidden">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" onclick="switchTab('explanation')">I. Explanation</button>
+                    <button class="tab-btn" onclick="switchTab('modules')">II. Modules & Syllabus</button>
+                    <button class="tab-btn" onclick="switchTab('resources')">III. Resources & Literature</button>
+                </div>
+
+                <div id="explanation-card" class="output-card tab-content">
+                    <h3>Conceptual Overview</h3>
+                    <div class="content-body" id="explanation-content"></div>
+                </div>
+
+                <div id="modules-card" class="output-card tab-content hidden">
+                    <h3>Structured Modules</h3>
+                    <div class="content-body" id="modules-content"></div>
+                </div>
+
+                <div id="resources-card" class="output-card tab-content hidden">
+                    <h3>Recommended Resources</h3>
+                    <div class="content-body" id="resources-content"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
