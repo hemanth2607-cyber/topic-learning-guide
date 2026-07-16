@@ -1,5 +1,4 @@
 import os
-import re
 from openai import OpenAI
 
 class GrokEngine:
@@ -65,25 +64,50 @@ class GrokEngine:
         return system, user
 
     def _parse_tags(self, text: str) -> dict:
+        """Robust string splitting using native python find methods instead of regular expressions."""
         result = {
             "explanation": "",
             "modules": "",
             "resources": ""
         }
 
-        # Corrected regex patterns to properly target the standard [TAGS]
-        exp_pattern = re.search(r'\[EXPLANATION_SECTION\](.*?)(?=\[MODULES_SECTION\]|\[RESOURCES_SECTION\]|$)', text, re.DOTALL | re.IGNORECASE)
-        mod_pattern = re.search(r'\[MODULES_SECTION\](.*?)（?=\[EXPLANATION_SECTION\]|\[RESOURCES_SECTION\]|$)', text, re.DOTALL | re.IGNORECASE)
-        res_pattern = re.search(r'\[RESOURCES_SECTION\](.*?)(?=\[EXPLANATION_SECTION\]|\[MODULES_SECTION\]|$)', text, re.DOTALL | re.IGNORECASE)
+        exp_tag = "[EXPLANATION_SECTION]"
+        mod_tag = "[MODULES_SECTION]"
+        res_tag = "[RESOURCES_SECTION]"
 
-        if exp_pattern:
-            result["explanation"] = exp_pattern.group(1).strip()
-        if mod_pattern:
-            result["modules"] = mod_pattern.group(1).strip()
-        if res_pattern:
-            result["resources"] = res_pattern.group(1).strip()
+        # Locate tag indexes inside the response
+        exp_idx = text.find(exp_tag)
+        mod_idx = text.find(mod_tag)
+        res_idx = text.find(res_tag)
 
-        # If any specific parse fails or is empty, use raw text fallback to prevent losing output
+        # 1. Parse Explanation
+        if exp_idx != -1:
+            end_idx = len(text)
+            if mod_idx != -1 and mod_idx > exp_idx:
+                end_idx = min(end_idx, mod_idx)
+            if res_idx != -1 and res_idx > exp_idx:
+                end_idx = min(end_idx, res_idx)
+            result["explanation"] = text[exp_idx + len(exp_tag):end_idx].strip()
+
+        # 2. Parse Modules
+        if mod_idx != -1:
+            end_idx = len(text)
+            if exp_idx != -1 and exp_idx > mod_idx:
+                end_idx = min(end_idx, exp_idx)
+            if res_idx != -1 and res_idx > mod_idx:
+                end_idx = min(end_idx, res_idx)
+            result["modules"] = text[mod_idx + len(mod_tag):end_idx].strip()
+
+        # 3. Parse Resources
+        if res_idx != -1:
+            end_idx = len(text)
+            if exp_idx != -1 and exp_idx > res_idx:
+                end_idx = min(end_idx, exp_idx)
+            if mod_idx != -1 and mod_idx > res_idx:
+                end_idx = min(end_idx, mod_idx)
+            result["resources"] = text[res_idx + len(res_tag):end_idx].strip()
+
+        # Fallback if no tags are matched
         if not result["explanation"] and not result["modules"] and not result["resources"]:
             result["explanation"] = text
             result["modules"] = "Review the explanation tab for details."
