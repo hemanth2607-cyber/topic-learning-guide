@@ -175,3 +175,17 @@ button#generate-btn:hover {
 .hidden {
     display: none !important;
 }
+
+/* Custom Styling for Generated Links */
+.content-body a {
+    color: #1a2a3a;                      /* Elegant dark slate blue */
+    text-decoration: none;               /* Remove harsh default underline */
+    border-bottom: 1px dashed #1a2a3a;   /* Subtle dashed line underneath */
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.content-body a:hover {
+    color: #555555;                      /* Charcoal color on hover */
+    border-bottom-style: solid;          /* Solid line on hover */
+}
