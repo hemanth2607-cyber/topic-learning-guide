@@ -71,9 +71,10 @@ class GrokEngine:
             "resources": ""
         }
 
-        exp_pattern = re.search(r'\\[EXPLANATION_SECTION\\](.*?)(?=\\[MODULES_SECTION\\]|\\[RESOURCES_SECTION\\]|$)', text, re.DOTALL | re.IGNORECASE)
-        mod_pattern = re.search(r'\\[MODULES_SECTION\\](.*?)(?=\\[EXPLANATION_SECTION\\]|\\[RESOURCES_SECTION\\]|$)', text, re.DOTALL | re.IGNORECASE)
-        res_pattern = re.search(r'\\[RESOURCES_SECTION\\](.*?)(?=\\[EXPLANATION_SECTION\\]|\\[MODULES_SECTION\\]|$)', text, re.DOTALL | re.IGNORECASE)
+        # Corrected regex patterns to properly target the standard [TAGS]
+        exp_pattern = re.search(r'\[EXPLANATION_SECTION\](.*?)(?=\[MODULES_SECTION\]|\[RESOURCES_SECTION\]|$)', text, re.DOTALL | re.IGNORECASE)
+        mod_pattern = re.search(r'\[MODULES_SECTION\](.*?)（?=\[EXPLANATION_SECTION\]|\[RESOURCES_SECTION\]|$)', text, re.DOTALL | re.IGNORECASE)
+        res_pattern = re.search(r'\[RESOURCES_SECTION\](.*?)(?=\[EXPLANATION_SECTION\]|\[MODULES_SECTION\]|$)', text, re.DOTALL | re.IGNORECASE)
 
         if exp_pattern:
             result["explanation"] = exp_pattern.group(1).strip()
@@ -82,6 +83,7 @@ class GrokEngine:
         if res_pattern:
             result["resources"] = res_pattern.group(1).strip()
 
+        # If any specific parse fails or is empty, use raw text fallback to prevent losing output
         if not result["explanation"] and not result["modules"] and not result["resources"]:
             result["explanation"] = text
             result["modules"] = "Review the explanation tab for details."
