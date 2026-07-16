@@ -17,14 +17,11 @@ class GrokEngine:
             "\\n\\nCRITICAL FORMATTING & LANGUAGE REQUIREMENTS:\\n"
             "1. NO PREAMBLE RULE: Do NOT write any introduction, greetings, conversational filler, "
             "or metadata explanations. Start your output immediately with '[EXPLANATION_SECTION]'.\\n"
-            "2. LANGUAGE DETECT RULE: Detect the language of the input topic. "
-            "Write the content under all sections in that exact language/script.\\n"
-            "3. THANGLISH QUALITY RULE: If the detected language is Thanglish, you must write in natural, "
-            "colloquial phonetic Tamil used by native speakers. Follow these examples to avoid artificial translations:\\n"
-            "   - Improper/Bad Thanglish: 'Object-oriented programming paradigm based on conceptual objects. Idhu code structures direct panna help pannum.'\\n"
-            "   - Proper/Natural Thanglish (Use this style): 'Object-oriented programming (OOP) oru programming paradigm. Idhu full-ah 'objects' concepts-ah base panni dhaan work aagum. Real-world structures-ah code-la mimic panna idhu romba use aagum.'\\n"
-            "   - Key Vocabulary: Use conversational words like 'idhu', 'iruku', 'solli tharum', 'kudunga', 'neriya concepts', 'romba useful-ah irukum', 'epdi work aagum-nu paakalam'.\\n"
-            "4. TAG RULE: Keep the section tags exactly in English (e.g., [EXPLANATION_SECTION]) so the backend parser can read them.\\n\\n"
+            "2. LANGUAGE MATCHING RULE:\\n"
+            "   - If the user's input topic is in standard English, you MUST generate the entire output in clean, standard English.\\n"
+            "   - If the user's input topic is in Tamil script (e.g. தமிழ்), you MUST generate the entire output in clean, standard Tamil script.\\n"
+            "   - If the user's input topic is in Thanglish (e.g. 'snake pathi sollu'), you MUST generate the entire output in natural, conversational Thanglish (using phonetic Tamil words like 'solren', 'iruku', 'kudunga').\\n"
+            "3. TAG RULE: Keep the section tags exactly in English (e.g., [EXPLANATION_SECTION]) so the backend parser can read them.\\n\\n"
             "[EXPLANATION_SECTION]\\n"
             "Your explanation text here...\\n\\n"
             "[MODULES_SECTION]\\n"
@@ -102,7 +99,7 @@ class GrokEngine:
         if res_idx != -1:
             end_idx = len(text)
             if exp_idx != -1 and exp_idx > res_idx:
-                end_idx = min(end_idx, exp_idx)
+                end_idx = min(end_idx, res_idx)
             if mod_idx != -1 and mod_idx > res_idx:
                 end_idx = min(end_idx, mod_idx)
             result["resources"] = text[res_idx + len(res_tag):end_idx].strip()
