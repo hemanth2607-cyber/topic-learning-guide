@@ -1,0 +1,12 @@
+{
+  "name": "topic-learning-guide",
+  "version": "1.0.0",
+  "description": "The Learning Path Engine - An Academic Curriculum Generator",
+  "private": true,
+  "scripts": {
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.12"
+  }
+}
