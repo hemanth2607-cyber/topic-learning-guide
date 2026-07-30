@@ -29,14 +29,11 @@ async def generate(request: GenerationRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Find the absolute path to the 'public' folder
-# This works both locally and inside Vercel's serverless environment
-current_file_path = os.path.abspath(__file__)        # api/index.py
-api_directory = os.path.dirname(current_file_path)   # api/
-project_root = os.path.dirname(api_directory)        # project root/
+# Serves static files locally
+current_file_path = os.path.abspath(__file__)
+api_directory = os.path.dirname(current_file_path)
+project_root = os.path.dirname(api_directory)
 public_directory = os.path.join(project_root, "public")
 
 if os.path.exists(public_directory):
     app.mount("/", StaticFiles(directory=public_directory, html=True), name="public")
-else:
-    print(f"Warning: Public directory not found at {public_directory}")

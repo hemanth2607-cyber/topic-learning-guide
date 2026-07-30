@@ -1,4 +1,5 @@
 import os
+# pyrefly: ignore [missing-import]
 from openai import OpenAI
 
 class GrokEngine:
@@ -21,14 +22,16 @@ class GrokEngine:
             "   - If the user's input topic is in standard English, you MUST generate the entire output in clean, standard English.\\n"
             "   - If the user's input topic is in Tamil script (e.g. தமிழ்), you MUST generate the entire output in clean, standard Tamil script.\\n"
             "   - If the user's input topic is in Thanglish (e.g. 'snake pathi sollu'), you MUST generate the entire output in natural, conversational Thanglish (using phonetic Tamil words like 'solren', 'iruku', 'kudunga').\\n"
-            "3. RESOURCE SEARCH LINKING RULE:\\n"
-            "   - AUTHOR & PLATFORM REQUIREMENT: For every book, you MUST explicitly write the author's name. For every course or tutorial, you MUST explicitly write the platform or publisher (e.g., Coursera, YouTube, GeeksforGeeks).\\n"
-            "   - NO BROKEN LINKS RULE: To prevent 404 or broken links, do NOT guess deep URLs. Instead, construct reliable search query links. Use these exact templates (replace spaces with '+' symbols inside the URLs):\\n"
-            "     * For Books (Online/E-books): Link them using Google Books Search or Amazon Search. "
-            "Example: '[Book Title by Author 🔗](https://www.google.com/search?tbm=bks&q=Book+Title+Author+Name)' or '[Book Title by Author 🔗](https://www.amazon.com/s?k=Book+Title+Author+Name)'.\\n"
-            "     * For Courses/Tutorials: Link them using YouTube Search or Google Search. "
-            "Example: '[Course Name (Platform) 🔗](https://www.youtube.com/results?search_query=Course+Name+Platform)' or '[Tutorial Name (Publisher) 🔗](https://www.google.com/search?q=Tutorial+Name+Publisher+tutorial)'.\\n"
-            "   - For physical/offline resources (such as hardback textbooks), do NOT create a hyperlink. "
+            "3. TARGETED SEARCH LINKING RULE:\\n"
+            "   - AUTHOR & CHANNEL REQUIREMENT: For every book, you MUST write the author's name. For every tutorial, you MUST specify the exact YouTube channel name (e.g., Programming with Mosh, freeCodeCamp) or platform (e.g., W3Schools, GeeksforGeeks).\\n"
+            "   - NO BROKEN LINKS RULE: To prevent 404 or broken links, do NOT guess deep URLs. Instead, construct high-precision search queries using these exact templates (replace spaces with '+' symbols inside the URLs):\\n"
+            "     * For exact YouTube Videos: Link to a targeted search query on YouTube: 'https://www.youtube.com/results?search_query=Topic+Tutorial+by+ChannelName'. "
+            "Example: '[OOP Tutorial by Programming with Mosh 🔗](https://www.youtube.com/results?search_query=OOP+Tutorial+by+Programming+with+Mosh)'.\\n"
+            "     * For exact Web Tutorials: Use Google's 'site:' operator to target only the official verified site. "
+            "Example: '[Java OOP Concepts (GeeksforGeeks) 🔗](https://www.google.com/search?q=site:geeksforgeeks.org+Java+OOP+Concepts)'.\\n"
+            "     * For Books (E-books): Link to Google Books search query: 'https://www.google.com/search?tbm=bks&q=Book+Title+Author+Name'. "
+            "Example: '[Head First OOP by Brett McLaughlin 🔗](https://www.google.com/search?tbm=bks&q=Head+First+OOP+Brett+McLaughlin)'.\\n"
+            "   - For physical/offline resources, do NOT create a hyperlink. "
             "Instead, write: 'Book Title by Author [📖 Physical Copy Only]'.\\n"
             "4. TAG RULE: Keep the section tags exactly in English (e.g., [EXPLANATION_SECTION]) so the backend parser can read them.\\n\\n"
             "[EXPLANATION_SECTION]\\n"
@@ -43,8 +46,8 @@ class GrokEngine:
             system = (
                 "You are an academic guide. Create an overview learning path.\\n"
                 "- Under '[EXPLANATION_SECTION]': Provide a simple 1-paragraph summary of the topic.\\n"
-                "- Under '[MODULES_SECTION]': Outline 3 basic, core modules to learn.\\n"
-                "- Under '[RESOURCES_SECTION]': Recommend 2 highly accessible basic books/guides, indicating format (hard copy, e-book) and where to find them."
+                "- Under '[MODULES_SECTION]': Outline 3 basic, core modules to learn, providing a high-precision YouTube video search link for each.\\n"
+                "- Under '[RESOURCES_SECTION]': Recommend 2 highly accessible basic books/guides, using targeted Google Books search links."
                 + tag_instruction
             )
             user = f"Generate an Overview path for '{topic}'."
@@ -52,8 +55,8 @@ class GrokEngine:
             system = (
                 "You are an academic instructor. Create a detailed learning path.\\n"
                 "- Under '[EXPLANATION_SECTION]': Provide a thorough explanation of the concepts so the user can easily explain it to others.\\n"
-                "- Under '[MODULES_SECTION]': Outline 5-6 structured modules to master.\\n"
-                "- Under '[RESOURCES_SECTION]': Recommend 3-4 essential textbooks (with authors and formats) and high-quality web resources."
+                "- Under '[MODULES_SECTION]': Outline 5-6 structured modules to master, linking each to a targeted YouTube tutorial or a site-specific Google search.\\n"
+                "- Under '[RESOURCES_SECTION]': Recommend 3-4 essential textbooks with authors, formats, and targeted search links."
                 + tag_instruction
             )
             user = f"Generate a Detailed path for '{topic}'."
@@ -61,8 +64,8 @@ class GrokEngine:
             system = (
                 "You are an advanced researcher and professor. Create a deep research-level learning path.\\n"
                 "- Under '[EXPLANATION_SECTION]': Provide an academic breakdown covering advanced theories, histories, and current research trends.\\n"
-                "- Under '[MODULES_SECTION]': Outline an exhaustive syllabus of advanced concepts and mathematical/design foundations.\\n"
-                "- Under '[RESOURCES_SECTION]': Recommend graduate-level textbooks, seminal academic papers, and advanced online courses."
+                "- Under '[MODULES_SECTION]': Outline an exhaustive syllabus of advanced concepts, linking each module to targeted academic search queries or official documentations.\\n"
+                "- Under '[RESOURCES_SECTION]': Recommend graduate-level textbooks, seminal academic papers, and advanced online courses with verified search queries."
                 + tag_instruction
             )
             user = f"Generate a Deep Learn path for '{topic}'."
@@ -81,7 +84,6 @@ class GrokEngine:
         mod_tag = "[MODULES_SECTION]"
         res_tag = "[RESOURCES_SECTION]"
 
-        # Locate tag indexes inside the response
         exp_idx = text.find(exp_tag)
         mod_idx = text.find(mod_tag)
         res_idx = text.find(res_tag)
